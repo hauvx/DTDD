@@ -1,0 +1,73 @@
+﻿@{ int soLuongGioHang = Session["cart"] == null ? 0 : ((List<PRODUCT>)Session["cart"]).Count();
+
+    int tongTien = 0; }
+
+<div class="label">
+    <i class="ion-bag"></i> @ViewBag.sl
+</div>
+
+<div class="overlay"></div>
+
+<div class="window">
+    <div class="title">
+        <button type="button" class="close"><i class="ion-android-close"></i></button>
+        <h4>Giỏ hàng</h4>
+    </div>
+
+    <div id="cartContent" class="content">
+        @if (soLuongGioHang > 0)
+        {
+            using (THUONGMAIDIENTUEntities db = new THUONGMAIDIENTUEntities())
+            {
+                foreach (var product in ((List<PRODUCT>)Session["cart"]))
+                {
+                    var item = db.PRODUCTs.Where(x => x.IdProduct == product.IdProduct).FirstOrDefault();
+                    var loaisp = db.CATEGORY_PRODUCT.Where(x => x.IdCategory == product.IdProduct).FirstOrDefault();
+                    tongTien += (int)item.ProductPrice;
+                    <div class="media">
+                        <div class="media-left">
+                            <a href="#">
+                                <img class="media-object" src="~/img/product/@item.PRODUCT_IMG.FirstOrDefault().Filename" alt="HP Chromebook 11" />
+                            </a>
+                        </div>
+                        <div class="media-body">
+                            <h4 class="media-heading">@item.ProductName</h4>
+                            <label>@item.CATEGORY_PRODUCT.CategoryName</label>
+                            <p class="price">$@item.ProductPrice</p>
+                        </div>
+                        <div class="controls">
+                            <div class="input-group">
+                                @*<span class="input-group-btn">
+                                        <button class="btn btn-default btn-sm" type="button" data-action="minus"><i class="ion-minus-round"></i></button>
+                                    </span>*@
+                                <input type="text" class="form-control input-sm" placeholder="Qty" value="@product.Quantily" readonly="">
+                                @*<span class="input-group-btn">
+                                        <button class="btn btn-default btn-sm" type="button" data-action="plus"><i class="ion-plus-round"></i></button>
+                                    </span>*@
+                            </div><!-- /input-group -->
+
+                            <a onclick="RemoveCart(@item.IdProduct)"> <i class="ion-trash-b"></i> Remove </a>
+                        </div>
+                    </div>
+
+                }
+            }
+
+        }
+        else
+        {
+            <div style="border-width:1">
+                <img src="~/img/product/empty-cart.png" class="img-cart-empty" width="100%" height="100%">
+            </div>
+
+        }
+    </div>
+
+    <div class="checkout container-fluid">
+        <div class="row">
+            <div class="col-xs-12 col-sm-12 align-right">
+                <a class="btn btn-primary" href="/Cart"> Đặt hàng </a>
+            </div>
+        </div>
+    </div>
+</div>

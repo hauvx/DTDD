@@ -1,0 +1,162 @@
+﻿
+
+@{ int soLuongGioHang = Session["cart"] == null ? 0 : ((List<PRODUCT>)Session["cart"]).Count();
+  
+    int tongTien = 0; }
+<form action="#" method="post" id="formPayment">
+    <div class="row">
+        <div class="col-md-7">
+            <div class="row group">
+                <div class="col-sm-4"><h2 class="h4">Phone</h2></div>
+                <div class="col-sm-8"> <input type="number" required class="form-control" name="CustomerPhone" id="CustomerPhone" placeholder="Số Điện Thoại..." onchange="GetCustomer()" /></div>
+            </div>
+
+            <div class="row group">
+                <div class="col-sm-4"><h2 class="h4">Name</h2></div>
+                <div class="col-sm-8"> <input type="text" required class="form-control" id="CustomerName" name="CustomerName" placeholder="Nhập tên...." /></div>
+            </div>
+
+            <div class="row group">
+                <div class="col-sm-4"><h2 class="h4">E-mail</h2></div>
+                <div class="col-sm-8"> <input type="email" required class="form-control" id="CustomerEmail" name="CustomerEmail" placeholder="Email..." /></div>
+            </div>
+
+            <div class="row group">
+                <div class="col-sm-4"><h2 class="h4">Address</h2></div>
+                <div class="col-sm-8"> <input type="text" required class="form-control" id="CustomerAddress" name="CustomerAddress" placeholder="Địa chỉ.." /></div>
+            </div>
+
+            <div class="row group">
+                <div class="col-sm-4"><h2 class="h4">Note</h2></div>
+                <div class="col-sm-8"> <input type="text" required class="form-control" name="CustomerComment" placeholder="Yêu cầu khác.." /></div>
+            </div>
+
+            <div class="row group">
+                <div class="col-sm-4"><h2 class="h4">Giftcode</h2></div>
+                <div class="col-sm-8"> <input type="text" class="form-control" onchange="CheckGiftCode()" id="Giftcode" name="Giftcode" placeholder="Nhập mã giảm giá của bạn vào đây nếu có" /></div>
+            </div>
+            <div>
+                <input type="text" name="Total" id="Total" value="@tongTien" hidden />
+            </div>
+           
+
+            <hr class="offset-lg visible-xs visible-sm">
+            <hr class="offset-lg visible-xs">
+        </div>
+
+        <div class="col-md-5 white">
+            <hr class="offset-md visible-xs visible-sm">
+            <div class="checkout-cart">
+                <div class="content">
+
+
+                    @using (THUONGMAIDIENTUEntities db = new THUONGMAIDIENTUEntities())
+                    {
+                        foreach (var product in ((List<PRODUCT>)Session["cart"]))
+                        {
+                            var item = db.PRODUCTs.Where(x => x.IdProduct == product.IdProduct).FirstOrDefault();
+
+
+
+
+                            <div class="media">
+                                <div class="media-left">
+                                    <a href="#">
+                                        <img class="media-object" src="~/img/product/@item.PRODUCT_IMG.FirstOrDefault().Filename" alt="HP@item.ProductName" />
+                                    </a>
+                                </div>
+                                <div class="media-body">
+                                    <h2 class="h4 media-heading">@item.ProductName</h2>
+                                    @*<label>Tablets</label><br />*@
+                                    @{
+                                        var pro = db.PRODUCT_PROMOTION.Where(p => p.IdProduct == product.IdProduct).ToList();
+
+
+                                        if (pro.Count == 0)
+                                        {
+
+                                            tongTien += (int)@item.ProductPrice * product.Quantily;
+                                            <span class="price">$@item.ProductPrice</span>
+                                        }
+                                        else
+                                        {
+                                            foreach (var p in pro)
+                                            {
+                                                var promotion = db.PROMOTIONs.Where(x => x.IdPromotion == p.IdPromotion).FirstOrDefault();
+                                                //check thời gian
+                                                if (promotion.PromotionStart.Value <= DateTime.Now && promotion.PromotionEnd >= DateTime.Now)
+                                                {
+                                                    var price = @item.ProductPrice - @p.Discount;
+                                                    tongTien += (int)price * product.Quantily;
+
+                                                    <span class="price"><del>$@item.ProductPrice</del></span>
+                                                    <span class="price">$@price</span>
+                                                    break;
+                                                }
+                                                else
+                                                {
+                                                    <span class="price">$@item.ProductPrice</span>
+                                                }
+                                            }
+                                        }
+                                    }
+
+
+
+
+                                </div>
+                                <div class="controls">
+                                    <div class="input-group">
+                                        <span class="input-group-btn">
+                                            <button class="btn btn-default btn-sm" onclick="EditCart(@product.IdProduct,'DOWN')" type="button" data-action="minus"><i class="ion-minus-round"></i></button>
+                                        </span>
+                                        <input type="text" class="form-control input-sm" placeholder="Qty" value="@product.Quantily" readonly="">
+                                        <span class="input-group-btn">
+                                            <button class="btn btn-default btn-sm" onclick="EditCart(@product.IdProduct,'UP')" type="button" data-action="plus"><i class="ion-plus-round"></i></button>
+                                        </span>
+                                    </div><!-- /input-group -->
+
+                                    <a onclick="RemoveCart(@item.IdProduct)"> <i class="ion-trash-b"></i> Remove </a>
+                                </div>
+                            </div>
+                        }
+                    }
+
+                </div>
+            </div>
+            <hr class="offset-md visible-xs visible-sm">
+        </div>
+
+        <hr class="offset-lg hidden-xs">
+
+        <div class="col-sm-12 white">
+            <hr class="offset-md">
+            <div class="row">
+                <div class="col-xs-6 col-md-4">
+                    @if(tongTien == 0)
+                    {
+                        tongTien =ViewBag.tongtien;
+                    }
+                    <h3 class="h5 no-margin">Total: $<span id="totalCartt">@String.Format("{0:N0}", tongTien)</span> </h3>
+                    @*<h3 class="h5 no-margin">Promo: $@String.Format("{0:N0}", tongTien)</h3>*@
+                    <h3 class="h5 no-margin">GiftCode: <span id="valGifCode"> $@String.Format("{0:N0}", 0)</span></h3>
+                    <h3 class="h4 no-margin">Total Payment: <span id="valTotalPayment"> $@String.Format("{0:N0}", tongTien)</span></h3>
+                </div>
+                <div class="col-md-4 hidden-xs">
+                </div>
+                <div class="col-xs-6 col-md-4">
+                    <input name="PaymentMethod" id="PaymentMethod" hidden />
+                    <input name="BankCode" id="BankCode" hidden />
+
+                </div>
+                <div style=" width: 41%; float: right;">
+                    <button class="btn btn-primary" onclick="CheckoutNganLuong(4)" type="button">Ngân Lượng</button>
+                    <button class="btn btn-primary" onclick="CheckoutNganLuong(3)" type="submit">Paypal</button>
+                    <button class="btn btn-primary" type="button" onclick="Payment(1)">Đặt hàng COD</button>
+                </div>
+            </div>
+            <hr class="offset-md">
+        </div>
+
+    </div>
+</form>

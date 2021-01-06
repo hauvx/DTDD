@@ -1,0 +1,379 @@
+﻿@using ThuongMaiDienTu.Helper;
+@using X.PagedList.Mvc.Common;
+@using X.PagedList.Mvc;
+@using X.PagedList;
+@model X.PagedList.PagedList<PRODUCT>
+@{
+    ViewBag.Title = "Danh mục sản phẩm";
+    string id = (string)ViewBag.Id;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .label-custom a {   
+        text-decoration: none;
+        color: black;
+    }
+</style>
+<hr class="offset-top">
+<div class="tags" id="SPTheogia">
+    <div class="container">
+        @*<div class="btn-group pull-right sorting">
+                <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="ion-arrow-down-b"></i> Sorting by name
+                </button>
+
+                <ul class="dropdown-menu">
+                    <li class="active"><a href="#"> <i class="ion-arrow-down-c"></i> Name [A-Z]</a></li>
+                    <li><a href="#"> <i class="ion-arrow-up-c"></i> Name [Z-A]</a></li>
+                    <li><a href="#"> <i class="ion-arrow-down-c"></i> Price [Low-High]</a></li>
+                    <li><a href="#"> <i class="ion-arrow-up-c"></i> Price [High-Low]</a></li>
+                </ul>
+            </div>*@
+
+        <div class="btn-group pull-right sorting">
+            <form action="/Category/Index" method="get">
+                <div class="row">
+                    <div class="col-6">
+                        <div class="search-input">
+                            <input type="text" id="txtSearch" placeholder="Nhập tên điện thoại" autocomplete="off" role="textbox" aria-autocomplete="list" aria-haspopup="true" name="timkiem" class="ui-autocomplete-input">
+                            <input type="hidden" name="page" class="ui-autocomplete-input" value="@ViewBag.page">
+                            
+                            @if (ViewBag.id == "0")
+                            {
+                                <input type="hidden" name="id" value="all" class="ui-autocomplete-input" />
+                            }
+                            else
+                            {
+                                <input type="hidden" name="id" value="@Request.Url.Segments[2].Split('-')[Request.Url.Segments[2].Split('-').Length - 1]" class="ui-autocomplete-input" />
+                            }
+                        </div>
+                    </div>
+                    <input type="hidden" id="key" data-key="@ViewBag.key" />
+                    <div class="col-6">
+                        <div class="search-button">
+                            <button type="submit" class="btn-search" id="btn_search">
+                                <span class="ic-search"></span>
+                                <span class="text">Tìm kiếm</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+            </form>
+
+        </div>
+
+        <p>Search by tags</p>
+        <div class="btn-group">
+
+            @if (id == "0")
+            {<label class="btn btn-default label-custom active">
+                    <a href="/dtdd/all" class="menu-con"><i class="" fa-1.5x"></i> All </a>
+                </label>
+
+            }
+            else
+            {
+                <label class="btn btn-default label-custom">
+                    <a href="/dtdd/all" class="menu-con"><i class="" fa-1.5x"></i> All </a>
+                </label>
+            }
+            @using (THUONGMAIDIENTUEntities db = new THUONGMAIDIENTUEntities())
+            {
+
+                foreach (var category in db.CATEGORY_PRODUCT.ToList())
+                {
+
+
+                    string link = "/dtdd/" + RemoveVietnamese.RemoveSign4VietnameseString(category.CategoryName).Replace(" ", "-") + "-" + category.IdCategory;
+
+                    if (id == (RemoveVietnamese.RemoveSign4VietnameseString(category.CategoryName).Replace(" ", "-") + "-" + category.IdCategory).ToString())
+                    {
+                        <label class="btn btn-default label-custom active">
+                            <a href="@link" class="menu-con"><i class="@category.CategoryIcon fa-1.5x"></i> @category.CategoryName </a>
+                        </label>
+                    }
+                    else
+                    {
+                        <label class="btn btn-default label-custom">
+                            <a href="@link" class="menu-con"><i class="@category.CategoryIcon fa-1.5x"></i> @category.CategoryName </a>
+                        </label>
+                    }
+
+                }
+            }
+
+
+        </div>
+        <div class="btn-group">
+
+
+
+
+
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <!-- Filter -->
+        <div class="col-sm-4 col-md-3">
+            <hr class="offset-lg">
+
+            <div class="filter">
+                <div class="item">
+                    <div class="title">
+                        <a href="#clear" data-action="open" class="down"> <i class="ion-android-arrow-dropdown"></i> Open</a>
+                        <a href="#clear" data-action="clear"> <i class="ion-ios-trash-outline"></i> Clear</a>
+                        <h1 class="h4">Chọn mức giá</h1>
+                    </div>
+
+                   
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios1" value="1">
+                        <label class="form-check-label" for="exampleRadios1">
+                            $0 - $1000
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios2" value="2">
+                        <label class="form-check-label" for="exampleRadios2">
+                            $1000 - $5000
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios3" value="3">
+                        <label class="form-check-label" for="exampleRadios3">
+                            $5000 - $10000
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios4" value="4">
+                        <label class="form-check-label" for="exampleRadios4">
+                            $10000 - $15000
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios5" value="5">
+                        <label class="form-check-label" for="exampleRadios5">
+                            $15000 - $20000
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios6" value="6">
+                        <label class="form-check-label" for="exampleRadios6">
+                            >$20000
+                        </label>
+                    </div>
+
+                </div>
+
+                <br>
+
+               
+
+                <br>
+
+              
+                <br>
+
+               
+
+
+
+            </div>
+        </div>
+        <!-- /// -->
+        <!-- Products -->
+        @*<div id="slider-container"></div>*@
+        @*<p>
+                <label for="amount">Price range:</label>
+                <input type="text" id="amount" style="border: 0; color: #f6931f; font-weight: bold;" />
+            </p>
+            <div id="computers">
+                <div class="system" data-price="0">div1 - 299</div>
+                <div class="system" data-price="599">div2 - 599</div>
+                <div class="system" data-price="1000000 ">div3 - 1099</div>
+            </div>*@
+
+        <div class="col-sm-12 col-md-9" id="resultprice">
+
+            <hr class="offset-lg">
+
+            <div class="products">
+                <div class="row" id="dataReturn">
+
+                    @using (THUONGMAIDIENTUEntities db = new THUONGMAIDIENTUEntities())
+                    {
+                        //var price = db.PRODUCTs.Where(x=>x.ProductPrice ==  Model.Min(y=>y.ProductPrice) || x.ProductPrice == Model.Max(z=>z.ProductPrice));
+                        foreach (var product in Model)
+                        {
+                            string link = "/" + RemoveVietnamese.RemoveSign4VietnameseString(@product.ProductName).Replace(" ", "-") + "-" + product.IdProduct;
+
+
+                            <div class="col-sm-6 col-md-4 product system">
+                                <div class="body">
+                                    <a href="#favorites" class="favorites" data-favorite="inactive"><i class="ion-ios-heart-outline"></i></a>
+                                    <a href="@link">
+                                        <div style="height:350px; align-items:center; justify-content:center; align-self:center">
+                                            <img src="~/img/product/@product.PRODUCT_IMG.FirstOrDefault().Filename" alt="Apple iMac 27 Retina" />
+                                        </div>
+                                    </a>
+                                    <div class="content">
+                                        <h1 class="h3">@product.ProductName</h1>
+                                        <div class="price" data-price="@product.ProductPrice">$@String.Format("{0:0,0}", product.ProductPrice)</div>
+
+                                        <button class="btn btn-primary btn-sm rounded" onclick="AddCart(@product.IdProduct)">  <i class="ion-bag"></i> Add to cart</button>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+
+
+
+                </div>
+            </div>
+
+            <nav>
+                @*<ul class="pagination">
+                        <li>
+                            <a href="#" aria-label="Previous">
+                                <span aria-hidden="true"><i class="ion-ios-arrow-left"></i></span>
+                            </a>
+                        </li>
+                        <li class="active">
+                            <a href="#">1</a>
+                        </li>
+                        <li><a href="#">2</a></li>
+                        <li><a href="#">3</a></li>
+                        <li class="disabled"><a href="#">..</a></li>
+                        <li><a href="#">10</a></li>
+                        <li>
+                            <a href="#" aria-label="Next">
+                                <span aria-hidden="true"><i class="ion-ios-arrow-right"></i></span>
+                            </a>
+                        </li>
+                    </ul>*@
+                Trang @(Model.PageCount<Model.PageNumber ? 0 : Model.PageNumber)/@Model.PageCount;
+                <div class="pageList" style="display:inline">
+                    @Html.PagedListPager((IPagedList)Model, page => Url.Action("Index",
+                   new
+                        {
+                            page = page,
+                       timkiem = ViewBag.Key,
+                       id = ViewBag.id
+
+                   }),
+                   new PagedListRenderOptions
+                   {
+                       LiElementClasses = new string[] { "page-item" }
+
+                   })
+
+
+                </div>
+            </nav>
+        </div>
+        <!-- /// -->
+    </div>
+</div>
+<script type="text/javascript">
+
+    function AddCart(IDProduct) {
+
+        $.ajax({
+            url: '/Ajax/AddCart/' + IDProduct,
+            type: 'GET',
+            dataType: 'text'
+        }).done(function (ketqua) {
+            var json = JSON.parse(ketqua);
+            if (json.Success == "1") {
+                alert("Thêm vào giỏ hàng thành công");
+                location.reload();
+                $('.cart').css({ 'opacity': '1' });
+                $("#SoLuongGioHang").html(json.Message);
+                return;
+            }
+            alert(json.Message);
+        });
+    }
+
+    function removeVietnameseTones(str) {
+        str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, "a");
+        str = str.replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g, "e");
+        str = str.replace(/ì|í|ị|ỉ|ĩ/g, "i");
+        str = str.replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/g, "o");
+        str = str.replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g, "u");
+        str = str.replace(/ỳ|ý|ỵ|ỷ|ỹ/g, "y");
+        str = str.replace(/đ/g, "d");
+        str = str.replace(/À|Á|Ạ|Ả|Ã|Â|Ầ|Ấ|Ậ|Ẩ|Ẫ|Ă|Ằ|Ắ|Ặ|Ẳ|Ẵ/g, "A");
+        str = str.replace(/È|É|Ẹ|Ẻ|Ẽ|Ê|Ề|Ế|Ệ|Ể|Ễ/g, "E");
+        str = str.replace(/Ì|Í|Ị|Ỉ|Ĩ/g, "I");
+        str = str.replace(/Ò|Ó|Ọ|Ỏ|Õ|Ô|Ồ|Ố|Ộ|Ổ|Ỗ|Ơ|Ờ|Ớ|Ợ|Ở|Ỡ/g, "O");
+        str = str.replace(/Ù|Ú|Ụ|Ủ|Ũ|Ư|Ừ|Ứ|Ự|Ử|Ữ/g, "U");
+        str = str.replace(/Ỳ|Ý|Ỵ|Ỷ|Ỹ/g, "Y");
+        str = str.replace(/Đ/g, "D");
+        str = str.replace(/\u0300|\u0301|\u0303|\u0309|\u0323/g, "");
+        str = str.replace(/\u02C6|\u0306|\u031B/g, "");
+        str = str.replace(/ + /g, " ");
+        str = str.trim();
+        str = str.replace(/!|%|\^|\*|\(|\)|\+|\=|\<|\>|\?|\/|,|\.|\:|\;|\'|\"|\&|\#|\[|\]|~|\$|_|`|-|{|}|\||\\/g, " ");
+        return str;
+    }
+
+    currencyFormat = (num) => {
+        if (num == 0) {
+            return '';
+        } else {
+            return num.toFixed(0).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+        }
+    };
+
+    $(document).ready(function () {
+        $(".form-check-input").change(function () {
+            var timkiem = $("input[type=hidden][id=key]").data("key");
+            //alert(timkiem);
+            var url = location.href;
+            var kitu = url.lastIndexOf("/");
+            var val = $('.form-check-input:checked').val();
+            if (url.includes("?")) {
+                var cate = url.substr(url.lastIndexOf("=")+1);
+            }
+            else {
+                var cate = url.substr(kitu + 1, (url.length - url.lastIndexOf("/")) - 1);
+            }
+            
+            $.ajax({
+                type: "POST",
+                url: '/Category/FilterByPriceA?val=' + val + '&cate=' + cate + '&timkiem=' + timkiem,
+
+                success: function (data) {
+                    //  alert(data);
+                    $("#resultprice").html(data);
+                }
+            });
+
+
+
+
+
+        })
+    })
+
+
+
+    //$(document).ready(function () {
+
+    //    $(".form-check-input").change(function () {
+
+    //        var val1 = $('.form-check-input:checked').val();
+    //        alert(val1);
+
+    //        //
+    //    });
+
+    //}
+</script>

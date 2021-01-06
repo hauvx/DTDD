@@ -1,0 +1,45 @@
+﻿
+@using (THUONGMAIDIENTUEntities db = new THUONGMAIDIENTUEntities())
+{
+    int id = (int)ViewBag.Id;
+    var info_new = db.NEWS.Where(x => x.IdNews == id).FirstOrDefault();
+    ViewBag.Title = info_new.IdNews;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+
+    <link href="~/Content/Tintuc.css" rel="stylesheet" />
+    <br />
+    <br />
+
+    <div class="blog-item">
+        <hr class="offset-lg visible-xs">
+        <hr class="offset-lg visible-xs">
+
+        <img src="~/img/tintuc/@info_new.NewsThumbail" alt="Apple 3D Touch" class="hidden-xs" />
+        @*<img src="~/assetsHome/assets/img/blog/item-photo-xs.jpg" alt="Apple 3D Touch" class="visible-xs" />*@
+
+        <div class="white">
+            <hr class="offset-md">
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-8 col-sm-offset-2">
+                        <h1 style="text-align:center">  @info_new.NewsTitle</h1>
+                        <i style="text-align:end">Bài viết được viết bời <b>@info_new.USER.Fullname</b></i>
+                        <br>
+                        @Html.Raw(info_new.NewsDetail)
+                        <br>
+
+                        <button class="btn btn-primary btn-sm facebook"> <i class="ion-social-facebook"></i> Share </button>
+                        <button class="btn btn-primary btn-sm twitter"> <i class="ion-social-twitter"></i> Retweet</button>
+                        <button class="btn btn-primary btn-sm googleplus"> <i class="ion-social-googleplus"></i> Plus </button>
+                    </div>
+                </div>
+            </div>
+            <hr class="offset-lg">
+            <hr class="offset-lg">
+        </div>
+        <hr class="offset-md">
+ 
+    </div>
+
+}

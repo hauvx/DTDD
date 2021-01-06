@@ -1,0 +1,192 @@
+﻿
+@{
+    ViewBag.Title = "checkOrder";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<div class="container">
+    <div style="height:500px;padding:50px" class="padding: 5rem">
+        <h2 style="text-align:center;font-weight:bold">Kiểm tra hóa đơn</h2>
+     
+            <div class="form-group">
+                <label style="font-style:italic" for="exampleInputEmail1">Nhập số điện thoại</label>
+                <input type="number" class="form-control" id="exampleInputEmail1" name="phone" placeholder="Nhập số điện thoại để kiếm tra thông tin đơn hàng">
+            </div>
+            <div style="text-align:center">
+                <button onclick="CheckDataOrderAction()" class="btn btn-primary">Kiểm tra</button>
+            </div>
+          
+        
+    </div>
+
+    <div id="order">
+        
+
+     
+    </div>
+    <style>
+           
+    </style>
+</div>
+<div class="modal" id="checkSDT" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Xác thực số điện thoại</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+               <p>Nhập mã code được gửi về số điện thoại để xác thực</p>
+              <input id="codeSMS" type="text"/>
+            </div>
+            <div class="modal-footer">
+                <button type="button" onclick="CheckCodee()" class="btn btn-primary">Save changes</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal" id="modalCheckOrder" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title text-center" style="font-weight:bold">Thông tin các đơn hàng bạn đã đặt</h3>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+              <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th scope="col">Mã Đơn Hàng</th>
+                    <th scope="col">Thời Gian Đặt</th>
+                    <th scope="col">Tổng Tiền</th>
+                    <th scope="col">Trạng Thái</th>
+                    <th scope="col">Thanh Toán</th>
+                </tr>
+            </thead>
+            <tbody id="dataReturn"> 
+</tbody>
+        </table>
+            </div>
+            <div class="modal-footer">
+        
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+
+    getStringTThai = (val) => {
+        switch (val) {
+            case 1:
+                return "Đang được xử lý"
+                break;
+            case 3:
+                return "Đang giao"
+                break;
+            case 4:
+                return "Giao thành công"
+                break;
+            case 5:
+                return "Đơn hàng đã hủy"
+                break;
+            default:
+                return "Đơn hàng không TT"
+        }
+    }
+    getStringThanhToan = (val) => {
+        switch (val) {
+            case 1:
+                return "COD"
+                break;
+            case 3:
+                return "Đã thanh toán online"
+                break;
+            default:
+                return "Đơn hàng không TT"
+        }
+    }
+    currencyFormat = (num) => {
+        if (num == 0) {
+            return '';
+        } else {
+            return num.toFixed(0).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+        }
+    };
+
+ 
+    function CheckDataOrderAction() {
+        var phone = $("[name='phone']").val();
+        $.ajax({
+            url: '/Ajax/checkPhone?phone=' + phone,
+            type: 'GET',
+            contentType: "application/x-www-form-urlencoded; charset=utf-8",
+            dataType: 'json'
+        }).done(function (result) {
+            if (result.Success == true) {
+                   $('#checkSDT').modal('show');
+                    
+                
+
+                //console.log(result)
+                //var html = "";
+                //result.Data.map((item) => html += `<tr> <th scope='row'> ${item.IdOrder}</th > <td>${item.DateOrder}</td><td>${currencyFormat(item.Total)}</td> <td>${getStringTThai(item.IdStatus)}</td> <td>${getStringThanhToan(item.IdPayment)}</td></tr>`)
+
+                //$("#dataReturn").html(html);
+            
+                //$('#modalCheckOrder').modal('show');
+
+                    ////$("#order").html('<div>result.Data[0].IdOrder</div>')
+                ////$("[name='phone']").val(result.Data[0].IdOrder);
+                return;
+            }
+            else {
+                alert(result.Message);
+                return;
+            }
+        });
+    }
+    function CheckCodee() {
+        var phone = $("[name='phone']").val();
+        var codeSMS = $("#codeSMS").val();
+        $.ajax({
+            url: '/Ajax/checkCodeSMS?phone=' + phone + '&code='+codeSMS,
+            type: 'GET',
+            contentType: "application/x-www-form-urlencoded; charset=utf-8",
+            dataType: 'json'
+        }).done(function (result) {
+            if (result.Success == true) {
+                $('#checkSDT').modal('hide');
+
+
+                //console.log(result)
+                var html = "";
+                result.Data.map((item) => html += `<tr> <th scope='row'> ${item.IdOrder}</th > <td>${item.DateOrder}</td><td>${currencyFormat(item.Total)}</td> <td>${getStringTThai(item.IdStatus)}</td> <td>${getStringThanhToan(item.IdPayment)}</td></tr>`)
+
+                $("#dataReturn").html(html);
+
+                $('#modalCheckOrder').modal('show');
+
+                //$("#order").html('<div>result.Data[0].IdOrder</div>')
+                //$("[name='phone']").val(result.Data[0].IdOrder);
+                return;
+            }
+            else {
+                alert(result.Message);
+                return;
+            }
+        });
+    }
+
+</script>

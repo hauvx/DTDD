@@ -1,0 +1,162 @@
+﻿@using ThuongMaiDienTu.Helper;
+
+@{
+    ViewBag.Title = "Index";
+    int id = (int)ViewBag.Id;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<link href="~/Content/Tintuc.css" rel="stylesheet" />
+    
+<hr class="offset-top">
+
+<div class="tags">
+    <div class="container">
+        <p>Search by tags</p>
+        <div class="btn-group">
+            @if (id == -1)
+            {
+                <label class="btn btn-default btn-sm active">
+                    <a href="/News/Index/">  All</a>
+
+                </label>
+            }
+            else
+            {
+                <label class="btn btn-default btn-sm">
+                    <a href="/News/Index/">  All</a>
+                        
+                </label>
+            }
+
+            @using (THUONGMAIDIENTUEntities db = new THUONGMAIDIENTUEntities())
+            {
+                foreach (var cateNew in db.CATEGORY_NEWS.ToList())
+                {
+                    if (id == cateNew.IdCategory)
+                    {
+                        <label class="btn btn-default btn-sm active">
+                            <a href="/News/Index/@cateNew.IdCategory">  @cateNew.CategoryName</a>
+
+                        </label>
+                    }
+                    else
+                    {
+                        <label class="btn btn-default btn-sm">
+                            <a href="/News/Index/@cateNew.IdCategory">  @cateNew.CategoryName</a>
+
+                        </label>
+                    }
+
+                    @*<a class="nav-link active" href="/News"><i class="@cateNew.CategoryIcon"></i> @cateNew.CategoryName</a>*@
+
+                }
+            }
+
+        </div>
+    </div>
+</div>
+<hr class="offset-md">
+<div class="blog">
+    <div class="container">
+        <div class="row">
+
+            @using (THUONGMAIDIENTUEntities db = new THUONGMAIDIENTUEntities())
+            {
+             
+                if (id == -1)
+                {
+                    foreach (var news in db.NEWS.ToList())
+                    {
+                        string link = "/tin-tuc/" + RemoveVietnamese.RemoveSign4VietnameseString(news.NewsTitle).Replace(" ", "-") + "-" + news.IdNews;
+
+                        <div class="col-sm-6 col-md-6 item">
+
+                            <div class="body">
+
+                                <a href="@link">
+
+                                    <img src="~/img/tintuc/@news.NewsThumbail" title="@news.IdNews" alt="@news.IdNews">
+
+
+                                </a>
+
+                                <div class="caption">
+                                    <h1 class="h3">@news.NewsTitle</h1>
+                                    <label> @news.DateCreate.ToString()</label>
+                                    <hr class="offset-sm">
+
+                                    <p>
+                                        @news.NewsSumary
+                                    </p>
+                                    <hr class="offset-sm">
+
+                                    <a href="@link"> Xem chi tiết <i class="ion-ios-arrow-right"></i> </a>
+                                </div>
+                            </div>
+                        </div>
+
+                    }
+                }
+                else
+                {
+                    foreach (var news in db.NEWS.Where(x=>x.IdCategory==id).ToList())
+                    {
+                        string link = "/tin-tuc/" + RemoveVietnamese.RemoveSign4VietnameseString(news.NewsTitle).Replace(" ", "-") + "-" + news.IdNews;
+
+                        <div class="col-sm-6 col-md-6 item">
+
+                            <div class="body">
+
+                                <a href="@link">
+
+                                    <img src="~/img/tintuc/@news.NewsThumbail" title="@news.IdNews" alt="@news.IdNews">
+
+
+                                </a>
+
+                                <div class="caption">
+                                    <h1 class="h3">@news.NewsTitle</h1>
+                                    <label> @news.DateCreate.ToString()</label>
+                                    <hr class="offset-sm">
+
+                                    <p>
+                                        @news.NewsSumary
+                                    </p>
+                                    <hr class="offset-sm">
+
+                                    <a href="@link"> Xem chi tiết <i class="ion-ios-arrow-right"></i> </a>
+                                </div>
+                            </div>
+                        </div>
+
+                    }
+                }
+
+
+
+            }
+
+        </div>
+
+        @*<nav>
+            <ul class="pagination">
+                <li>
+                    <a href="#" aria-label="Previous">
+                        <span aria-hidden="true"><i class="ion-ios-arrow-left"></i></span>
+                    </a>
+                </li>
+                <li class="active"><a href="#">1</a></li>
+                <li><a href="#">2</a></li>
+                <li><a href="#">3</a></li>
+                <li class="disabled"><a href="#">..</a></li>
+                <li><a href="#">10</a></li>
+                <li>
+                    <a href="#" aria-label="Next">
+                        <span aria-hidden="true"><i class="ion-ios-arrow-right"></i></span>
+                    </a>
+                </li>
+            </ul>
+        </nav>*@
+
+    </div>
+</div>

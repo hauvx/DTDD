@@ -1,0 +1,82 @@
+﻿@model ThuongMaiDienTu.ORDER
+@{
+    Layout = null;
+
+}
+
+
+<br />
+<br />
+<br />
+<ul class="nav nav-tabs">
+    <li class="nav-item">
+        <a class="nav-link active" data-toggle="tab" href="#home">Thông tin</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" data-toggle="tab" href="#menu1">Lịch sử chỉnh sửa</a>
+    </li>
+
+</ul>
+
+@using (THUONGMAIDIENTUEntities db = new THUONGMAIDIENTUEntities())
+{
+    if (Model != null)
+    {
+        var order = db.ORDERs.Where(x => x.IdOrder == Model.IdOrder).FirstOrDefault();
+        <div id="menu1" class="tab-pane fade">
+           
+
+            <table class="table table-hover">
+                <tbody>
+                    <tr>
+                        <th>
+                            Mã đơn hàng
+                        </th>
+                        <th>
+                            Khách hàng
+                        </th>
+                        <th>
+                            Ngày giờ
+                        </th>
+
+                        <th>
+                            Trạng thái chuyển
+                        </th>
+                        <th>
+                            Hình thức thanh toán
+                        </th>
+                    </tr>
+                  
+                    @foreach (var history in order.ORDER_HISTORY.OrderByDescending(x => x.IdHistory).ToList())
+                    {
+                        var ngayGio = history.DateHistory is null ? "Không có thông tin" : history.DateHistory.Value.ToString("dd/MM/yyyy HH:mm:ss");
+                        <tr>
+                            <th>
+                                @history.IdOrder
+                            </th>
+                            <td>
+                                @history.ORDER.CUSTOMER.CustomerName
+                            </td>
+                            <td>
+                                @ngayGio
+                            </td>
+
+                            <td>
+                                @history.PAYMENT_STATUS.StatusName
+                            </td>
+                            <td>
+                                @history.ORDER.PAYMENT_METHOD.PaymentName
+                            </td>
+                        </tr>
+                    }
+
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div>Không có đơn hàng!</div>
+    }
+}
+

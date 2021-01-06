@@ -1,0 +1,413 @@
+﻿@model ThuongMaiDienTu.PRODUCT
+@using ThuongMaiDienTu.Helper;
+
+@{ Layout = "~/Views/Shared/_Layout.cshtml";
+
+    ViewBag.Title = "Điện thoại : " + Model.ProductName;
+    ViewBag.Description = "Mô tả : " + Model.ProductSumary;
+    ViewBag.imgid = Model.IdProduct;
+}
+
+
+
+<link href="~/assetsHome/assets/css/carousel-product.css" rel="stylesheet" />
+<link href="~/assetsHome/assets/css/custom.css" rel="stylesheet" />
+<link href="~/assetsHome/assets/ionicons-2.0.1/css/ionicons.css" rel="stylesheet" />
+<link href="~/Content/comment.css" rel="stylesheet" />
+
+
+
+<hr class="offset-lg">
+<hr class="offset-lg">
+<hr class="offset-lg hidden-xs">
+<style>
+    .info-detail {
+        background-color: white;
+        padding: 30px;
+    }
+
+    .products-detail {
+        background-color: white
+    }
+</style>
+<section class="product">
+    @using (THUONGMAIDIENTUEntities db = new THUONGMAIDIENTUEntities())
+    {
+
+
+        var product = db.PRODUCTs.Where(x => x.IdProduct == Model.IdProduct).FirstOrDefault();
+        string linkProduct = "http://m-store.store"+"/" + RemoveVietnamese.RemoveSign4VietnameseString(@product.ProductName).Replace(" ", "-") + "-" + product.IdProduct;
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-7 col-md-7 no-padding">
+
+                    <div class="caption">
+
+                        <img src="~/img/product/@product.PRODUCT_IMG.FirstOrDefault().Filename" alt="@product.PRODUCT_IMG.FirstOrDefault().ImgAlt" width="250" />
+
+                        <h1>@product.ProductName</h1>
+
+                        <p> &middot; OS Windows™ 10</p>
+                        <p> &middot; 28 Inch PixelSense™ Display</p>
+                        <p> &middot; Intel Core i5/i7</p>
+                        <hr class="offset-md hidden-sm">
+                        <hr class="offset-sm visible-sm">
+                        <hr class="offset-xs visible-sm">
+
+                        <p class="price">$@String.Format("{0:0,0}", product.ProductPrice)</p>
+
+                        <hr class="offset-md">
+
+                        <button class="btn btn-primary rounded" type="button" onclick="AddCart()"> <i class="ion-bag"></i> Add to cart</button>
+                        <button class="btn btn-link" type="button" onclick="BuyNow()"> <i class="ion-ios-heart"></i> Buy Now </button>
+                        <div class="btn btn-link" id="fb-root"></div>
+
+
+
+                        @*FaceBook Share*@
+                        <script>
+                            (function (d, s, id) {
+                                var js, fjs = d.getElementsByTagName(s)[0];
+                                if (d.getElementById(id)) return;
+                                js = d.createElement(s); js.id = id;
+                                js.src = "https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.0";
+                                fjs.parentNode.insertBefore(js, fjs);
+                            }(document, 'script', 'facebook-jssdk'));</script>
+
+                        <!-- Your share button code -->
+                        <div class="fb-share-button"
+                             data-href=@linkProduct
+                             data-layout="button_count">
+                        </div>
+                        @*End FaceBook Share*@
+                        <h2>@product.ProductName</h2>
+
+                        <p>
+                            @product.ProductSumary
+                        </p>
+                        <br />
+
+                    </div>
+                    <br />
+
+                </div>
+
+                <div class="col-sm-5 col-md-5 white no-padding-xs ">
+                    <h2>Thông tin cấu hình</h2>
+                    <br>
+
+                    <table class="table table-striped">
+                        <tbody>
+                            @{ int i = 0;
+                                string tieude = "";
+                                foreach (var info in db.INFOes.OrderBy(x => x.InfoCategory).ToList())
+                                {
+                                    string thongtin = "";
+                                    int maSP = Model.IdProduct;
+                                    var thongtinDB = db.PRODUCT_INFO.Where(x => x.IdInfo == info.IdInfo && x.IdProduct == maSP).FirstOrDefault();
+                                    if (thongtinDB != null)
+                                    {
+                                        thongtin = thongtinDB.Info;
+                                    }
+                                    if (String.IsNullOrEmpty(thongtin))
+                                    {
+                                        continue;
+                                    }
+                                    if (!tieude.Equals(info.InfoCategory))
+                                    {
+                                        tieude = info.InfoCategory;
+
+                                        <tr>
+                                            <td colspan="2"><b>@tieude</b></td>
+                                        </tr>
+                                    }
+                                    <tr>
+                                        <td>@info.InfoName</td>
+                                        <td>
+                                            @thongtin
+                                        </td>
+                                    </tr>
+                                    i++;
+                                } }
+                        </tbody>
+                    </table>
+                    <hr class="offset-lg">
+                    @*<div class="carousel-product" data-count="4" data-current="1">
+
+                            <div class="items">
+                                <button class="btn btn-control" data-direction="right"> <i class="ion-ios-arrow-right"></i></button>
+                                <button class="btn btn-control" data-direction="left"> <i class="ion-ios-arrow-left"></i></button>
+                                @{ string sActive = "active"; }
+
+                                @foreach (var item in product.PRODUCT_IMG.ToList())
+                                {
+                            <div class="item center  @sActive">
+                                <img src="~/img/product/@item.Filename" alt="@item.ImgAlt" class="background" />
+                            </div>}
+                                <div class="item" data-marker="4">
+                                    <img src="../assets/img/product/video.jpg" alt="Microsoft Surface Studio" class="background" />
+
+                                    <div class="tiles">
+                                        <a href="#video" data-gallery="#video" data-source="youtube" data-id="BzMLA8YIgG0">
+                                            <img src="../assets/img/product/video.jpg" alt="Surface Studio">
+
+                                            <div class="overlay"></div>
+                                            <div class="content">
+                                                <div class="content-outside">
+                                                    <div class="content-inside">
+                                                        <i class="ion-ios-play"></i>
+                                                        <h2 class="white hidden-xs">Introducing Microsoft <br> Surface Studio</h2>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>*@
+                </div>
+
+            </div>
+            <hr class="offset-sm hidden-xs">
+
+
+        </div>}
+</section>
+
+
+<hr class="offset-lg">
+
+<div class="container" style="">
+    <h2>Mô tả sản phẩm</h2>
+    <div class="info-detail">
+
+
+        @Html.Raw(Model.ProductDetail)
+    </div>
+    <div class="form-group">
+        <h3>Bình luận</h3>
+
+        <button type="button" class="btn btn-primary btn-block" onclick="comment()">Bình luận</button>
+    </div>
+
+    @*@using(THUONGMAIDIENTUEntities db = new THUONGMAIDIENTUEntities())
+            {
+                var review = db.REVIEW_PRODUCT.ToList();
+                foreach (var list in review)
+                {
+        <b> @list.CUSTOMER.CustomerName</b>
+
+                    @list.ReviewContent
+
+                    @list.ReviewPoint
+                }
+            }*@
+
+    @using (THUONGMAIDIENTUEntities db = new THUONGMAIDIENTUEntities())
+    {
+        var review = db.REVIEW_PRODUCT.Where(x => x.IdProduct == Model.IdProduct).ToList();
+
+
+        foreach (var list in review)
+        {
+            <div class="comment-box">
+                <div class="comment-head">
+
+                    <h6 class="comment-name by-author"><a href="#">@list.CUSTOMER.CustomerName</a></h6>
+                    <span>@list.ReviewDate</span>
+                    <i class="fa fa-reply"></i>
+                    <i class="fa fa-heart"></i>
+                    <div class="star-ratings-css" title=".1000"></div>
+                </div>
+                <div class="comment-content">
+                    @list.ReviewContent
+                </div>
+            </div>
+            <br />
+        }
+    }
+
+</div>
+<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Bình luận sản phẩm</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="row group hide">
+                                <input name="IdProduct" value="@Model.IdProduct" />
+
+                            </div>
+                            <div class="row group">
+                                <div class="col-sm-4"><h2 class="h4">Số điện thoại</h2></div>
+                                <div class="col-sm-8"> <input type="number" class="form-control" name="CustomerPhone" id="CustomerPhone" placeholder="Số Điện Thoại..." onchange="Check()" /></div>
+                            </div>
+
+                            <div class="row group hide ">
+                                <div class="col-sm-4"><h2 class="h4">IDKHg</h2></div>
+                                <div class="col-sm-8"> <input type="text" class="form-control" id="IdCustomer" name="IdCustomer" placeholder="Nhập tên...." /></div>
+                            </div>
+                            <div class="row group">
+                                <div class="col-sm-4"><h2 class="h4">Tên khách hàng</h2></div>
+                                <div class="col-sm-8"> <input type="text" class="form-control" id="CustomerName" name="CustomerName" placeholder="Nhập tên...." /></div>
+                            </div>
+
+                            <div class="row group">
+                                <div class="col-sm-4"><h2 class="h4">E-mail</h2></div>
+                                <div class="col-sm-8"> <input type="email" class="form-control" id="CustomerEmail" name="CustomerEmail" placeholder="Email..." /></div>
+                            </div>
+
+                            <div class="row group">
+                                <div class="col-sm-4"><h2 class="h4">Địa chỉ</h2></div>
+                                <div class="col-sm-8"> <input type="text" class="form-control" id="CustomerAddress" name="CustomerAddress" placeholder="Địa chỉ.." /></div>
+                            </div>
+                            <div class="row group">
+                                <div class="col-sm-4"><h2 class="h4">Đánh giá sao</h2></div>
+                                <div class="col-sm-8"> <input type="number" class="form-control" name="ReviewPoint" min="0" max="5" placeholder="Điểm.." /></div>
+                            </div>
+                            <div class="row group">
+                                <div class="col-sm-4"><h2 class="h4">Bình luận</h2></div>
+                                <div class="col-sm-8"><textarea class="form-control" id="ReviewContent" rows="3"></textarea></div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-primary" onclick="Save()">Bình luận</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    function comment() {
+
+
+        $('#exampleModalCenter').modal('show')
+    }
+    function Check() {
+        var phone = $("[name='CustomerPhone']").val();
+        //if (phone == '') {
+        //    $("[name='CustomerName']").prop("disabled", true);
+        //    $("[name='CustomerEmail']").prop("disabled", true);
+        //    $("[name='CustomerAddress']").prop("disabled", true);
+        //    return;
+        //}
+
+        $.ajax({
+            url: '/Ajax/GetCustomer?phone=' + phone,
+            type: 'GET',
+            dataType: 'text'
+        }).done(function (ketqua) {
+            if (ketqua == null) return;
+            var json = JSON.parse(ketqua);
+
+            $("[name='CustomerName']").val(json.Name);
+            $("[name='CustomerAddress']").val(json.Address);
+            $("[name='IdCustomer']").val(json.id);
+            $("[name='CustomerEmail']").val(json.Email);
+
+
+        });
+    }
+
+    function GetCustomer() {
+        var phone = $("[name='CustomerPhone']").val();
+        //if (phone == '') {
+        //    $("[name='CustomerName']").prop("disabled", true);
+        //    $("[name='CustomerEmail']").prop("disabled", true);
+        //    $("[name='CustomerAddress']").prop("disabled", true);
+        //    return;
+        //}
+        alert(phone)
+        //$.ajax({
+        //    url: '/Ajax/GetCustomer?phone=' + phone,
+        //    type: 'GET',
+        //    dataType: 'text'
+        //}).done(function (ketqua) {
+        //    if (ketqua == null) return;
+        //    var json = JSON.parse(ketqua);
+        //    alert(ketqua)
+        //    //$("[name='CustomerName']").val(json.Name);
+        //    //$("[name='CustomerAddress']").val(json.Address);
+        //    //$("[name='IdCustomer']").val(json.id);
+        //    //$("[name='CustomerEmail']").val(json.Email);
+
+
+        //});
+
+    }
+        function BuyNow() {
+         $.ajax({
+                url: '/Ajax/AddCart/@Model.IdProduct',
+                type: 'GET',
+                dataType: 'text'
+         }).done(function (ketqua) {
+               location.href = "/Cart";
+             return;
+             location.reload();
+            });
+
+        }
+
+        function AddCart() {
+                 $.ajax({
+                url: '/Ajax/AddCart/@Model.IdProduct',
+                type: 'GET',
+                dataType: 'text'
+         }).done(function (ketqua) {
+             var json = JSON.parse(ketqua);
+             location.reload();
+             if (json.Success == "1") {
+                 
+                    alert("Thêm vào giỏ hàng thành công");
+                    
+                    //$("#SoLuongGioHang").html(json.Message);
+                    return;
+                }
+                alert(json.Message);
+            });
+    }
+
+    function Save() {
+        var product = $("[name='IdProduct']").val();
+        var phone = $("[name='CustomerPhone']").val();
+        var custom = $("#IdCustomer").val();
+        var point = $("[name='ReviewPoint']").val();
+        var content = $("#ReviewContent").val();
+
+
+        if (phone == '' || content == '') {
+            alert('vui lòng nhập thông tin!');
+            return;
+        }
+        $.ajax({
+            url: '/Ajax/ReviewProduct',
+            type: 'POST',
+            dataType: 'text',
+            data: {
+                IdProduct: product,
+                IdCustomer: custom,
+                ReviewPoint: point,
+                ReviewContent: content
+            }
+        }).done(function (ketqua) {
+            if (ketqua == 'ok') {
+                location.reload();
+                return;
+            }
+        });
+    }
+</script>

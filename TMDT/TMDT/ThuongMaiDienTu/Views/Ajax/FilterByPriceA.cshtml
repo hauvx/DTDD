@@ -1,0 +1,55 @@
+﻿@using ThuongMaiDienTu.Helper;
+@using PagedList.Mvc;
+@model PagedList.PagedList<PRODUCT>
+
+
+@{
+    ViewBag.Title = "Danh mục sản phẩm";
+    string id = (string)ViewBag.Id;
+
+}
+<p>háhas</p>
+@*<hr class="offset-lg">
+
+<div class="products">
+    <div class="row" id="dataReturn">
+
+        @using (THUONGMAIDIENTUEntities db = new THUONGMAIDIENTUEntities())
+        {
+            //var price = db.PRODUCTs.Where(x=>x.ProductPrice ==  Model.Min(y=>y.ProductPrice) || x.ProductPrice == Model.Max(z=>z.ProductPrice));
+            foreach (var product in Model)
+            {
+                string link = "/" + RemoveVietnamese.RemoveSign4VietnameseString(@product.ProductName).Replace(" ", "-") + "-" + product.IdProduct;
+
+
+                <div class="col-sm-6 col-md-4 product system">
+                    <div class="body">
+                        <a href="#favorites" class="favorites" data-favorite="inactive"><i class="ion-ios-heart-outline"></i></a>
+                        <a href="@link">
+                            <div style="height:350px; align-items:center; justify-content:center; align-self:center">
+                                <img src="~/img/product/@product.PRODUCT_IMG.FirstOrDefault().Filename" alt="Apple iMac 27 Retina" />
+                            </div>
+                        </a>
+                        <div class="content">
+                            <h1 class="h3">@product.ProductName</h1>
+                            <div class="price" data-price="@product.ProductPrice">$@String.Format("{0:0,0}", product.ProductPrice)</div>
+
+                            <button class="btn btn-primary btn-sm rounded" onclick="AddCart(@product.IdProduct)">  <i class="ion-bag"></i> Add to cart</button>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+
+
+
+    </div>
+</div>
+
+<nav>
+   
+    Trang @(Model.PageCount<Model.PageNumber ? 0 : Model.PageNumber)/@Model.PageCount;
+    <div class="pageList" style="display:inline">
+        @Html.PagedListPager(Model, page => Url.Action("Index", new { page = page }))
+    </div>
+</nav>*@
